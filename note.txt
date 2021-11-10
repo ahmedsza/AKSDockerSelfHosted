@@ -1,0 +1,40 @@
+$rgname='azdevops'
+$aksname='aksazdevops01'
+$location='northeurope'
+$ACR_NAME= 'acrazdevops001'
+$WINDOWS_USERNAME='PUTINADMIN'
+$WINDOWS_PASSWORD='PUTINSTRONGPASSWORD_14ORCHARS'
+
+
+az group create -n $rgname -l $location
+
+az acr create -n $ACR_NAME -g $rgname --sku basic
+
+az aks create `
+    --resource-group $rgname `
+    --name $aksname `
+    --node-count 2 `
+    --generate-ssh-keys `
+    --windows-admin-username $WINDOWS_USERNAME `
+    --windows-admin-password $WINDOWS_PASSWORD `
+    --vm-set-type VirtualMachineScaleSets `
+    --kubernetes-version 1.20.7 `
+    --network-plugin azure `
+    --attach-acr $ACR_NAME
+
+
+az aks get-credentials --name $aksname --resource-group $rgname
+
+az aks nodepool add   --resource-group $rgname     --cluster-name $aksname     --os-type Windows   --name npwin  --node-count 1
+
+kubectl get nodes
+
+
+// build the image using azure container registry build
+az acr build --platform windows --registry $ACR_NAME --image dockeragent/latest . 
+
+
+// to cleanup
+
+az aks delete -n $aksname --resource-group $rgname
+az group delete  -n $rgname
