@@ -1,23 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: dockeragent-deployment
+  name: dockeragent-deployment-linux
   labels:
-    app: dockeragent-deployment
+    app: dockeragent-deployment-linux
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: dockeragent
+      app: dockeragent-linux
   template:
     metadata:
       labels:
-        app: dockeragent
-    spec:
-      nodeSelector:
-        "kubernetes.io/os": windows
+        app: dockeragent-linux
       containers:
-      - name: dockeragent
+      - name: dockeragent-linux
         image: <ACRNAME>.azurecr.io/dockeragent/latest:latest
         ports:
         - containerPort: 80
@@ -27,4 +24,4 @@ spec:
         - name: AZP_TOKEN
           value: PAT
         - name: AZP_AGENT_NAME
-          value: demodockeragent
+          value: demodockeragentlinux

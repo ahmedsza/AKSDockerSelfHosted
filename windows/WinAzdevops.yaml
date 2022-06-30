@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dockeragent-deployment-windows
+  labels:
+    app: dockeragent-deployment-windows
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dockeragent-windows
+  template:
+    metadata:
+      labels:
+        app: dockeragent-windows
+    spec:
+      nodeSelector:
+        "kubernetes.io/os": windows
+      containers:
+      - name: dockeragent
+        image: <ACRNAME>.azurecr.io/dockeragent/latest:latest
+        ports:
+        - containerPort: 80
+        env:
+        - name: AZP_URL
+          value: "https://dev.azure.com/<ORGNAME>"
+        - name: AZP_TOKEN
+          value: PAT
+        - name: AZP_AGENT_NAME
+          value: demodockeragent-windows
